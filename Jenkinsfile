@@ -1,3 +1,5 @@
+@Library('ci-lib') _
+
 pipeline {
   agent any
   options {
@@ -7,7 +9,7 @@ pipeline {
     disableConcurrentBuilds()
   }
   environment {
-    IMAGE_NAME = 'arijbelaid/contact-api' // ⚠️ Vérifie bien ton nom Docker Hub
+    IMAGE_NAME = 'arijbelaid/contact-api' 
   }
   stages {
     stage('Checkout') {
@@ -29,48 +31,39 @@ pipeline {
         stage('Unit tests') {
           agent { docker { image 'node:24-alpine'; reuseNode true } }
           steps {
-            sh 'npx vitest run tests --exclude tests/integration/** --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml'
-          }
-          post {
-            always { 
-              junit testResults: 'reports/junit.xml'
-            }
+            sh 'npx vitest run --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml'
           }
         }
       }
     }
-    stage('Build image') {
+    // 👇 C'EST ICI QU'ON UTILISE LA SHARED LIBRARY 👇
+    stage('Build & Push Image') {
       steps {
-        sh 'docker build -t $IMAGE_NAME:$SHORT_SHA --label org.opencontainers.image.revision=$GIT_COMMIT .'
-      }
-    }
-    stage('Push') {
-      when { branch 'main' } // <-- C'est cette ligne qui est importante
-      steps {
-        withCredentials([usernamePassword(credentialsId: 'dockerhub',
-                          usernameVariable: 'DH_USER', passwordVariable: 'DH_TOKEN')]) {
-          sh 'echo "$DH_TOKEN" | docker login -u "$DH_USER" --password-stdin'
-          sh 'docker push $IMAGE_NAME:$SHORT_SHA'
-          sh 'docker tag $IMAGE_NAME:$SHORT_SHA $IMAGE_NAME:latest-main'
-          sh 'docker push $IMAGE_NAME:latest-main'
+        script {
+          // On sépare l'image du tag pour notre fonction
+          // IMAGE_NAME vaut 'arijbelaid/contact-api', on veut 'contact-api' comme nom d'image
+          def imageBase = env.IMAGE_NAME.split('/')[-1] 
+          def registryBase = env.IMAGE_NAME.split('/')[0] + ".io" // docker.io
+          
+          buildAndPush(
+            imageName: imageBase,
+            tag: env.SHORT_SHA,
+            registry: registryBase,
+            credentialsId: 'dockerhub' // ⚠️ Vérifie que c'est bien le nom de ton credential Jenkins
+          )
         }
-        sh 'echo "$IMAGE_NAME:$SHORT_SHA" > image.txt'
-        archiveArtifacts artifacts: 'image.txt'
       }
     }
   }
   post {
     always {
-      junit testResults: 'reports/junit.xml', allowEmptyResults: true
+      junit 'reports/junit.xml'
     }
     success {
       echo 'Pipeline réussi.'
     }
-    failure {
-      echo 'Le pipeline a échoué.'
-    }
     cleanup {
-      cleanWs()
+      deleteDir() // Nettoie le workspace
     }
   }
 }
