@@ -9,7 +9,7 @@ pipeline {
     disableConcurrentBuilds()
   }
   environment {
-    IMAGE_NAME = 'arijbelaid/contact-api' 
+    IMAGE_NAME = 'arijbelaid/contact-api'
   }
   stages {
     stage('Checkout') {
@@ -36,20 +36,21 @@ pipeline {
         }
       }
     }
-    // 👇 C'EST ICI QU'ON UTILISE LA SHARED LIBRARY 👇
+    // 👇 UTILISATION DE LA SHARED LIBRARY 👇
     stage('Build & Push Image') {
       steps {
         script {
-          // On sépare l'image du tag pour notre fonction
-          // IMAGE_NAME vaut 'arijbelaid/contact-api', on veut 'contact-api' comme nom d'image
-          def imageBase = env.IMAGE_NAME.split('/')[-1] 
-          def registryBase = env.IMAGE_NAME.split('/')[0] + ".io" // docker.io
+          // On récupère juste 'contact-api' à partir de 'arijbelaid/contact-api'
+          def imageBase = env.IMAGE_NAME.split('/')[-1]
           
+          // On force le bon registre Docker Hub
+          def registryBase = 'docker.io/arjbelaid' 
+
           buildAndPush(
-            imageName: imageBase,
+            imageName: imageBase, // 'contact-api'
             tag: env.SHORT_SHA,
-            registry: registryBase,
-            credentialsId: 'dockerhub' // ⚠️ Vérifie que c'est bien le nom de ton credential Jenkins
+            registry: registryBase, // 'docker.io/arjbelaid'
+            credentialsId: 'dockerhub'
           )
         }
       }
@@ -63,7 +64,7 @@ pipeline {
       echo 'Pipeline réussi.'
     }
     cleanup {
-      deleteDir() // Nettoie le workspace
+      deleteDir()
     }
   }
 }
