@@ -7,7 +7,7 @@ pipeline {
     disableConcurrentBuilds()
   }
   environment {
-    IMAGE_NAME = 'arijbelaid/contact-api' // ⚠️ REMPLACE par ton nom Docker Hub
+    IMAGE_NAME = 'arijbelaid/contact-api' // ⚠️ Vérifie bien ton nom Docker Hub
   }
   stages {
     stage('Checkout') {
@@ -32,7 +32,9 @@ pipeline {
             sh 'npx vitest run --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml'
           }
           post {
-            always { junit 'reports/junit.xml' }
+            always { 
+              junit testResults: 'reports/junit.xml'
+            }
           }
         }
       }
@@ -59,7 +61,7 @@ pipeline {
   }
   post {
     always {
-      junit 'reports/junit.xml', allowEmptyResults: true
+      junit testResults: 'reports/junit.xml', allowEmptyResults: true
     }
     success {
       echo 'Pipeline réussi.'
