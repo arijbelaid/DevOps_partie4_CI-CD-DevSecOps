@@ -16,7 +16,7 @@ describe("POST /api/contact", () => {
     const res = await request(app)
       .post("/api/contact")
       .send({ name: "Ada", email: "ada@example.com", message: "Bonjour le monde" });
-    expect(res.status).toBe(500);
+    expect(res.status).toBe(201);
     expect(res.body).toEqual({ status: "ok" });
   });
 
