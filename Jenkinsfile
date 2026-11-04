@@ -29,7 +29,6 @@ pipeline {
         stage('Unit tests') {
           agent { docker { image 'node:24-alpine'; reuseNode true } }
           steps {
-            // MODIFICATION ICI : On exclut les tests d'intégration
             sh 'npx vitest run tests --exclude tests/integration/** --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml'
           }
           post {
@@ -46,7 +45,7 @@ pipeline {
       }
     }
     stage('Push') {
-      when { branch 'main' }
+      when { branch 'main' } // <-- C'est cette ligne qui est importante
       steps {
         withCredentials([usernamePassword(credentialsId: 'dockerhub',
                           usernameVariable: 'DH_USER', passwordVariable: 'DH_TOKEN')]) {
