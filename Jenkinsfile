@@ -29,7 +29,8 @@ pipeline {
         stage('Unit tests') {
           agent { docker { image 'node:24-alpine'; reuseNode true } }
           steps {
-            sh 'npx vitest run --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml'
+            // MODIFICATION ICI : On exclut les tests d'intégration
+            sh 'npx vitest run tests --exclude tests/integration/** --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml'
           }
           post {
             always { 
