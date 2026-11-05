@@ -9,10 +9,13 @@ def call(Map config = [:]) {
     echo "🐳 Construction de l'image Docker : ${fullImageName}"
     sh "docker build -t ${fullImageName} ."
 
-    echo "🚀 Push de l'image Docker : ${fullImageName}"
-    // On utilise 'string' au lieu de 'usernamePassword'
+    echo "🔑 Connexion à Docker Hub..."
     withCredentials([string(credentialsId: credentialsId, variable: 'DH_TOKEN')]) {
         sh 'echo "$DH_TOKEN" | docker login -u arijbelaid --password-stdin'
-        sh "docker push ${fullImageName}"
     }
+
+    echo "🚀 Push de l'image Docker : ${fullImageName}"
+    // Le push est EN DEHORS du bloc withCredentials
+    // Docker utilise le fichier ~/.docker/config.json créé par le login
+    sh "docker push ${fullImageName}"
 }
