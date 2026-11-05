@@ -10,8 +10,10 @@ def call(Map config = [:]) {
     sh "docker build -t ${fullImageName} ."
 
     withCredentials([string(credentialsId: credentialsId, variable: 'DH_TOKEN')]) {
+        // Nettoyer tout cache Docker existant
+        sh 'rm -f ~/.docker/config.json || true'
+        
         echo "🔑 Connexion à Docker Hub (docker.io)..."
-        // On précise explicitement docker.io pour que le token y soit associé
         sh 'echo "$DH_TOKEN" | docker login docker.io -u arijbelaid --password-stdin'
         
         echo "🚀 Push de l'image Docker : ${fullImageName}"
