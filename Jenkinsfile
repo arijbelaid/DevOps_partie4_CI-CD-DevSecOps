@@ -9,7 +9,7 @@ pipeline {
     disableConcurrentBuilds()
   }
   environment {
-    IMAGE_NAME = 'arijbelaid/contact-api'
+    IMAGE_NAME = 'arjbelaid/contact-api'
   }
   stages {
     stage('Checkout') {
@@ -36,21 +36,18 @@ pipeline {
         }
       }
     }
-    // 👇 UTILISATION DE LA SHARED LIBRARY AVEC LE NOUVEAU CREDENTIAL 👇
+    // 👇 UTILISATION DE LA SHARED LIBRARY AVEC LE SECRET TEXT 👇
     stage('Build & Push Image') {
       steps {
         script {
-          // On récupère juste 'contact-api' à partir de 'arijbelaid/contact-api'
           def imageBase = env.IMAGE_NAME.split('/')[-1]
-
-          // On force le bon registre Docker Hub
           def registryBase = 'docker.io/arjbelaid'
 
           buildAndPush(
-            imageName: imageBase, // 'contact-api'
+            imageName: imageBase,
             tag: env.SHORT_SHA,
-            registry: registryBase, // 'docker.io/arjbelaid'
-            credentialsId: 'dockerhub-v2' // <-- LE NOUVEAU CREDENTIAL ICI
+            registry: registryBase,
+            credentialsId: 'dockerhub-token-secret' // <-- Le credential Secret text
           )
         }
       }
