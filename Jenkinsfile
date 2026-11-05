@@ -36,21 +36,21 @@ pipeline {
         }
       }
     }
-    // 👇 UTILISATION DE LA SHARED LIBRARY 👇
+    // 👇 UTILISATION DE LA SHARED LIBRARY AVEC LE NOUVEAU CREDENTIAL 👇
     stage('Build & Push Image') {
       steps {
         script {
           // On récupère juste 'contact-api' à partir de 'arijbelaid/contact-api'
           def imageBase = env.IMAGE_NAME.split('/')[-1]
-          
+
           // On force le bon registre Docker Hub
-          def registryBase = 'docker.io/arjbelaid' 
+          def registryBase = 'docker.io/arjbelaid'
 
           buildAndPush(
             imageName: imageBase, // 'contact-api'
             tag: env.SHORT_SHA,
             registry: registryBase, // 'docker.io/arjbelaid'
-            credentialsId: 'dockerhub'
+            credentialsId: 'dockerhub-v2' // <-- LE NOUVEAU CREDENTIAL ICI
           )
         }
       }
