@@ -15,7 +15,7 @@
 </div>
 
 ---
-👉 **[Voir le rapport TP9 sur GitHub](https://github.com/arijbelaid/DevOps_partie4_CI-CD-DevSecOps/blob/main/rapport_tp9.docx)**
+👉 **[Voir le rapport TP9 sur GitHub](https://github.com/arijbelaid/DevOps_partie4_CI-CD-DevSecOps/blob/main/rapport_tp9.pdf)**
 
 ---
 
