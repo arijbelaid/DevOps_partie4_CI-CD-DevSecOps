@@ -11,10 +11,10 @@ def call(Map config = [:]) {
 
     withCredentials([string(credentialsId: credentialsId, variable: 'DH_TOKEN')]) {
         echo "🔑 Connexion à Docker Hub..."
-        sh 'echo "$DH_TOKEN" | docker login docker.io -u arijbelaid --password-stdin'
+        // .trim() supprime les espaces/retours à la ligne parasites
+        sh 'echo "$DH_TOKEN" | tr -d "[:space:]" | docker login docker.io -u arijbelaid --password-stdin'
         
-        // PAUSE CRUCIALE : laisser Docker Hub valider la session
-        sleep 5
+        sleep 3
         
         echo "🚀 Push de l'image Docker : ${fullImageName}"
         sh "docker push ${fullImageName}"
