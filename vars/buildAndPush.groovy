@@ -9,14 +9,20 @@ def call(Map config = [:]) {
     echo "🐳 Construction de l'image Docker : ${fullImageName}"
     sh "docker build -t ${fullImageName} ."
 
+    // Récupérer le token SANS le masquer dans une variable Groovy
+    def token = ""
     withCredentials([string(credentialsId: credentialsId, variable: 'DH_TOKEN')]) {
-        echo "🔑 Connexion à Docker Hub..."
-        // .trim() supprime les espaces/retours à la ligne parasites
-        sh 'echo "$DH_TOKEN" | tr -d "[:space:]" | docker login docker.io -u arijbelaid --password-stdin'
-        
-        sleep 3
-        
-        echo "🚀 Push de l'image Docker : ${fullImageName}"
-        sh "docker push ${fullImageName}"
+        token = env.DH_TOKEN
     }
+
+    // Nettoyer le token (supprimer espaces et retours à la ligne)
+    token = token.trim().replaceAll("\\s", "")
+
+    echo "🔑 Connexion à Docker Hub..."
+    sh "echo '${token}' | docker login docker.io -u arijbelaid --password-stdin"
+    
+    sleep 3
+    
+    echo "🚀 Push de l'image Docker : ${fullImageName}"
+    sh "docker push ${fullImageName}"
 }
