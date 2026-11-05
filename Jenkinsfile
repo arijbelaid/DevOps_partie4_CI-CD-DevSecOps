@@ -36,18 +36,17 @@ pipeline {
         }
       }
     }
-    // 👇 UTILISATION DE LA SHARED LIBRARY AVEC LE SECRET TEXT 👇
     stage('Build & Push Image') {
       steps {
         script {
           def imageBase = env.IMAGE_NAME.split('/')[-1]
-          def registryBase = 'docker.io/arjbelaid'
+          def registryBase = 'arjbelaid'
 
           buildAndPush(
             imageName: imageBase,
             tag: env.SHORT_SHA,
             registry: registryBase,
-            credentialsId: 'dockerhub-token-secret' // <-- Le credential Secret text
+            credentialsId: 'dockerhub-token-secret'
           )
         }
       }
