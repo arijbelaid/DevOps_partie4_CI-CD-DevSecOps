@@ -1,389 +1,270 @@
-# 🚀 TP9 : Pipeline as Code avec Jenkins & Shared Library
-
+ 
 <div align="center">
 
-### CI/CD • Docker Agents • Parallel Stages • Multibranch Pipeline
+# 🚀 TP9 — Pipeline as Code avec Jenkins
 
-![Jenkins](https://img.shields.io/badge/Jenkins-Pipeline_as_Code-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Agents-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![Node.js](https://img.shields.io/badge/Node.js-24-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![GitHub](https://img.shields.io/badge/GitHub-Multibranch-181717?style=for-the-badge&logo=github&logoColor=white)
-![CI/CD](https://img.shields.io/badge/CI%2FCD-Automation-6C63FF?style=for-the-badge)
+### Jenkinsfile · Docker Agents · Multibranch Pipeline · Shared Library
 
 **Master DevOps & Cloud — ISET Tozeur**
+
+![Jenkins](https://img.shields.io/badge/Jenkins-Pipeline%20as%20Code-D24939?style=for-the-badge&logo=jenkins&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Agents-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![GitHub](https://img.shields.io/badge/GitHub-Multibranch-181717?style=for-the-badge&logo=github&logoColor=white)
+![CI/CD](https://img.shields.io/badge/CI%2FCD-Automation-0097A7?style=for-the-badge)
 
 </div>
 
 ---
 
-## 📖 Présentation du projet
+## 📌 Présentation
 
-Ce projet met en œuvre un pipeline **CI/CD (Intégration Continue / Déploiement Continu)** pour l'API Node.js `contact-api`.
+Ce TP a pour objectif de mettre en place un pipeline CI/CD avec Jenkins en utilisant l'approche **Pipeline as Code**.
 
-Il illustre les concepts avancés de Jenkins à travers l'approche **Pipeline as Code**, l'utilisation d'agents Docker éphémères, l'exécution parallèle des stages, la gestion sécurisée des credentials, le tagging des images Docker basé sur le Git SHA et la création d'une Shared Library réutilisable.
+Le pipeline est défini dans un fichier `Jenkinsfile` versionné avec le code source de l'application. Il permet d'automatiser les différentes étapes de l'intégration continue, notamment la vérification du code, l'exécution des tests, la génération des rapports et la publication de l'image Docker.
 
-L'objectif est de garantir un feedback rapide aux développeurs, une traçabilité entre le code source et l'image Docker construite, ainsi qu'une gestion sécurisée des secrets.
+Ce travail permet également de découvrir les agents Docker, les pipelines multibranches et les Shared Libraries Jenkins.
 
-## 🎯 Objectifs pédagogiques
+## 🎯 Objectifs
 
-- Comprendre le fonctionnement d'un pipeline Jenkins déclaratif.
-- Définir les étapes CI/CD dans un fichier `Jenkinsfile`.
-- Utiliser des agents Docker pour exécuter les stages.
-- Exécuter les opérations de qualité en parallèle.
+- Définir un pipeline Jenkins à l'aide d'un `Jenkinsfile`.
+- Automatiser l'installation des dépendances.
+- Vérifier la qualité du code avec une étape de lint.
+- Exécuter les tests unitaires avec Vitest.
 - Générer et publier les rapports de tests JUnit.
-- Gérer les credentials Jenkins de manière sécurisée.
-- Construire une image Docker taguée avec le Git SHA.
-- Publier l'image Docker uniquement depuis la branche `main`.
-- Configurer un Multibranch Pipeline connecté à GitHub.
-- Factoriser les opérations Docker dans une Shared Library Jenkins.
+- Utiliser des agents Docker pour exécuter les étapes du pipeline.
+- Sécuriser les identifiants Docker Hub dans Jenkins.
+- Construire et publier une image Docker avec un tag basé sur le commit Git.
+- Mettre en place un pipeline multibranche.
+- Réutiliser des fonctions Jenkins avec une Shared Library.
 
-## 🏗️ Architecture du pipeline
+## 🛠️ Technologies utilisées
 
-Le pipeline est défini dans le fichier `Jenkinsfile` et suit le workflow suivant :
+| Technologie | Utilisation |
+|---|---|
+| Jenkins | Automatisation CI/CD |
+| Jenkinsfile | Définition du pipeline |
+| Docker | Exécution des agents et conteneurisation |
+| Node.js | Environnement d'exécution |
+| npm | Gestion des dépendances |
+| Vitest | Tests unitaires |
+| JUnit | Rapports de tests |
+| Git / GitHub | Gestion du code source |
+| Docker Hub | Publication des images |
+| Jenkins Shared Library | Réutilisation des étapes du pipeline |
 
-```text
-                    GitHub Repository
-                           |
-                           v
-                      Jenkins
-                           |
-                           v
-                       Checkout
-                           |
-                           v
-                        Install
-                           |
-                           v
-                  Quality (Parallel)
-                    /           \
-                   v             v
-                 Lint        Unit Tests
-                    \           /
-                     v         v
-                       Build
-                         |
-                         v
-                    Docker Image
-                         |
-                         v
-                    Git SHA Tag
-                         |
-                         v
-                  Shared Library
-                         |
-                         v
-                   Docker Hub Push
-                    (main only)
-                         |
-                         v
-                    Post Actions
-```
+---
 
-Les stages `Lint` et `Unit tests` sont exécutés en parallèle afin de réduire le temps de feedback.
-
-La publication de l'image Docker est réservée à la branche `main`.
-
-## 📂 Structure du dépôt
+## 📂 Structure du projet
 
 ```text
-contact-api/
+TP9/
+├── captures/
+│   ├── credentials-masked.png
+│   ├── credentials-masked.png.png
+│   ├── dockerhub-sha-tag.png
+│   ├── dockerhub-sha-tag1.png
+│   ├── junit-report.png.png
+│   ├── junit-report1.png.png
+│   ├── multibranch.png
+│   └── pipeline-stages.png.png
 │
 ├── Jenkinsfile
-│
+├── package.json
+├── package-lock.json
+├── Dockerfile
 ├── vars/
 │   └── buildAndPush.groovy
-│
-├── src/
-│   └── Code source de l'API
-│
-├── tests/
-│   └── Tests unitaires
-│
-├── Dockerfile
-│
-├── package.json
-│
-├── README.md
-│
-└── captures/
-    ├── pipeline-stages.png
-    ├── junit-report.png
-    ├── credentials-masked.png
-    ├── dockerhub-sha-tag.png
-    ├── multibranch.png
-    └── shared-library.png
+└── README.md
 ```
 
----
-
-# 🛠️ Configuration de l'environnement Jenkins
-
-## 🔌 Plugins Jenkins requis
-
-- Pipeline
-- Git
-- GitHub Branch Source
-- Docker Pipeline
-- JUnit
-- Credentials Binding
-- Workspace Cleanup
-- Timestamper
-
-## 🔑 Credentials Jenkins
-
-| ID | Type | Description |
-|---|---|---|
-| `dockerhub` | Username with password | Identifiant Docker Hub et access token |
-| `github-credentials` | Username with password | Identifiant GitHub et token d'accès |
-
-Les credentials sont enregistrés dans Jenkins et utilisés uniquement pendant les opérations nécessitant une authentification.
-
-## 📚 Configuration de la Shared Library
-
-| Paramètre | Valeur |
-|---|---|
-| Name | `ci-lib` |
-| Default version | `main` |
-| Retrieval method | Modern SCM |
-| SCM | Git |
-| Project Repository | URL du dépôt GitHub de la bibliothèque |
+> La structure ci-dessus présente les fichiers principaux du TP. Les fichiers de l'application peuvent varier selon ton dépôt.
 
 ---
 
-# 🧪 Partie 1 — Premier pipeline depuis le dépôt
+# 🧪 Partie 1 — Pipeline Jenkins et stages
 
-## 1. Ajouter le script de lint dans package.json
+Cette première partie consiste à définir les étapes du pipeline Jenkins et à automatiser les vérifications du code source.
 
-Le projet `contact-api` utilise un script de lint afin de vérifier la syntaxe du code JavaScript.
+Les principales étapes sont :
 
-Cette étape permet de détecter les erreurs avant l'exécution des tests et la construction de l'image Docker.
+- Checkout du dépôt Git.
+- Installation des dépendances avec `npm ci`.
+- Vérification du code avec Lint.
+- Exécution des tests unitaires.
+- Génération des rapports JUnit.
+- Construction de l'image Docker.
 
-### 📸 Capture 01 — Script Lint
+## 📸 Capture 01 — Pipeline Jenkins
 
-**Fichier :** `captures/pipeline-stages.png`
+![Pipeline Jenkins](captures/pipeline-stages.png.png)
 
-> Cette capture correspond à la configuration du script lint dans `package.json` et à son intégration dans le pipeline.
-
-## 2. Créer le job Jenkins et lancer le build
-
-Un job de type Pipeline est configuré dans Jenkins avec le dépôt GitHub du projet.
-
-Le fichier `Jenkinsfile` est utilisé comme source de définition du pipeline.
-
-### 📸 Capture 02 — Configuration du job Jenkins
-
-**Fichier :** `captures/pipeline-stages.png`
-
-> Cette capture présente la configuration du job Pipeline connecté au dépôt GitHub et le lancement du build Jenkins.
+*Visualisation des étapes du pipeline Jenkins et de leur exécution.*
 
 ---
 
-# 🐳 Partie 2 — Agents Docker, parallélisme et rapports JUnit
+# 🧪 Partie 2 — Tests unitaires et rapports JUnit
 
-## 1. Faire échouer un test volontairement
+Cette partie permet de vérifier le fonctionnement des tests unitaires et de générer des rapports exploitables par Jenkins.
 
-Un test est volontairement rendu incorrect afin de vérifier le comportement du pipeline lorsqu'une erreur survient.
+Les tests sont exécutés avec Vitest et les résultats sont publiés au format JUnit.
 
-Cette étape permet d'observer l'échec des tests et l'arrêt des stages suivants dépendants de leur réussite.
+L'objectif est de vérifier le comportement du pipeline lors de l'échec d'un test, puis après sa correction.
 
-### 📸 Capture 03 — Test volontairement échoué
+## 📸 Capture 02 — Rapport JUnit
 
-**Fichier :** `captures/junit-report.png`
+![Rapport JUnit](captures/junit-report.png.png)
 
-> Cette capture montre le résultat du test en échec et permet de vérifier le comportement du pipeline Jenkins.
+*Capture du rapport de tests JUnit.*
 
-## 2. Réparer le test
+## 📸 Capture 03 — Vérification des tests
 
-Après la correction du test, le pipeline est relancé.
+![Vérification des tests](captures/junit-report1.png.png)
 
-Les résultats sont générés au format JUnit et publiés dans Jenkins.
-
-### 📸 Capture 04 — Rapport JUnit
-
-**Fichier :** `captures/junit-report.png`
-
-> Cette capture présente les résultats des tests unitaires dans Jenkins après correction.
+*Capture complémentaire de la vérification des tests.*
 
 ---
 
-# 🔐 Partie 3 — Image Docker, Git SHA et Credentials
+# 🔐 Partie 3 — Gestion sécurisée des credentials
 
-## 1. Générer un token d'accès Docker Hub
+Cette partie consiste à configurer les identifiants Docker Hub dans Jenkins afin de permettre l'authentification lors de la publication de l'image Docker.
 
-Un access token Docker Hub est créé pour permettre l'authentification du pipeline Jenkins.
+Les credentials sont enregistrés dans Jenkins et utilisés par le pipeline sans exposer directement le token dans le code source.
 
-Le token est utilisé pour les opérations de connexion et de publication de l'image Docker.
+## 📸 Capture 04 — Credentials Jenkins
 
-### 📸 Capture 05 — Token Docker Hub
+![Credentials Jenkins](captures/credentials-masked.png)
 
-**Fichier :** `captures/credentials-masked.png`
+*Capture de la gestion des credentials Jenkins.*
 
-> Cette capture documente la création du token d'accès Docker Hub. La valeur du token ne doit jamais être visible.
+## 📸 Capture 05 — Masquage des credentials
 
-## 2. Ajouter le credential Docker Hub dans Jenkins
+![Credentials masqués](captures/credentials-masked.png.png)
 
-Le credential Docker Hub est enregistré dans Jenkins sous l'identifiant :
-
-```text
-dockerhub
-```
-
-Il permet au pipeline de s'authentifier sans intégrer les secrets directement dans le code source.
-
-### 📸 Capture 06 — Credentials Jenkins
-
-**Fichier :** `captures/credentials-masked.png`
-
-> Cette capture présente le credential Docker Hub configuré dans Jenkins sans exposer sa valeur.
-
-## 3. Relancer le build
-
-Le pipeline est relancé afin de vérifier la construction de l'image Docker et son processus d'authentification.
-
-L'image est taguée avec le Git SHA court pour assurer la traçabilité du commit.
-
-### 📸 Capture 07 — Build et publication Docker
-
-**Fichier :** `captures/dockerhub-sha-tag.png`
-
-> Cette capture présente le résultat du build et la référence de l'image Docker construite avec le tag Git SHA.
+*Vérification du masquage des informations sensibles dans Jenkins.*
 
 ---
 
-# 🌿 Partie 4 — Multibranch Pipeline
+# 🐳 Partie 4 — Construction et publication de l'image Docker
 
-## 1. Créer le credential GitHub dans Jenkins
+Le pipeline automatise la construction de l'image Docker et sa publication sur Docker Hub.
 
-Un credential GitHub est créé dans Jenkins afin de permettre l'accès au dépôt et la découverte des branches et Pull Requests.
+L'image est identifiée à l'aide d'un tag basé sur le commit Git afin de faciliter la traçabilité des versions.
 
-### 📸 Capture 08 — Credential GitHub
+Le pipeline utilise les credentials Jenkins pour effectuer l'authentification auprès de Docker Hub.
 
-**Fichier :** `captures/multibranch.png`
+## 📸 Capture 06 — Image Docker Hub et tag SHA
 
-> Cette capture présente le credential GitHub configuré dans Jenkins.
+![Docker Hub SHA](captures/dockerhub-sha-tag.png)
 
-## 2. Créer le job Multibranch Pipeline
+*Capture de l'image Docker publiée avec son tag basé sur le commit Git.*
 
-Un job Multibranch Pipeline est configuré pour analyser le dépôt GitHub.
+## 📸 Capture 07 — Vérification du tag Docker
 
-Le scan périodique permet de détecter les nouvelles branches et Pull Requests.
+![Vérification du tag Docker](captures/dockerhub-sha-tag1.png)
 
-### 📸 Capture 09 — Multibranch Pipeline
-
-**Fichier :** `captures/multibranch.png`
-
-> Cette capture présente le job Multibranch et les branches détectées par Jenkins.
-
-## 3. Créer une branche
-
-Une branche de fonctionnalité est créée afin de tester le fonctionnement du pipeline sur une branche différente de `main`.
-
-### 📸 Capture 10 — Branche Feature
-
-**Fichier :** `captures/multibranch.png`
-
-> Cette capture présente la branche de fonctionnalité créée dans le dépôt GitHub.
-
-## 4. Faire le merge
-
-La branche de fonctionnalité est intégrée dans la branche principale après la validation de la Pull Request.
-
-### 📸 Capture 11 — Merge dans main
-
-**Fichier :** `captures/multibranch.png`
-
-> Cette capture présente l'intégration de la branche de fonctionnalité dans `main`.
-
-## 5. Tester le stage Push sur la branche
-
-Le pipeline est exécuté sur la branche de fonctionnalité afin de vérifier que le stage Push n'est pas exécuté en dehors de `main`.
-
-### 📸 Capture 12 — Vérification du stage Push
-
-**Fichier :** `captures/multibranch.png`
-
-> Cette capture présente le comportement du stage Push sur la branche de fonctionnalité.
-
-## 6. Vérification du pipeline Multibranch
-
-Le pipeline est vérifié sur les branches et Pull Requests ainsi que sur la branche principale après le merge.
-
-La publication de l'image Docker est conditionnée par la branche `main`.
-
-### 📸 Capture 13 — Vérification finale
-
-**Fichier :** `captures/multibranch.png`
-
-> Cette capture présente la vérification finale du pipeline Multibranch et du comportement de publication.
+*Capture complémentaire de la vérification du tag de l'image Docker.*
 
 ---
 
-# 📚 Défi — Shared Library Jenkins
+# 🌿 Partie 5 — Multibranch Pipeline
 
-## 1. Créer le fichier de la Shared Library
+Le Multibranch Pipeline permet à Jenkins de détecter et d'exécuter automatiquement un pipeline pour les différentes branches du dépôt Git.
 
-La logique de construction et de publication de l'image Docker est extraite dans une bibliothèque Jenkins réutilisable.
+Cette configuration facilite la gestion des branches de développement et la vérification des modifications avant leur intégration dans la branche principale.
 
-Le fichier utilisé est :
+Les principales fonctionnalités étudiées sont :
 
-```text
-vars/buildAndPush.groovy
-```
+- Détection des branches Git.
+- Création automatique des pipelines par branche.
+- Analyse du dépôt GitHub.
+- Exécution du pipeline selon la branche.
+- Vérification des étapes de build.
 
-Cette bibliothèque permet de centraliser les opérations Docker et de réduire la duplication du code dans les pipelines.
+## 📸 Capture 08 — Jenkins Multibranch Pipeline
 
-### 📸 Capture 14 — Shared Library
+![Multibranch Pipeline](captures/multibranch.png)
 
-**Fichier :** `captures/shared-library.png`
+*Visualisation du pipeline multibranche Jenkins.*
 
-> Cette capture présente le fichier `buildAndPush.groovy` contenant la fonction réutilisable.
+---
 
-## 2. Déclarer la bibliothèque dans Jenkins et lancer le build
+# 📚 Partie 6 — Jenkins Shared Library
 
-La bibliothèque est déclarée dans le `Jenkinsfile` avec :
+La Shared Library permet de centraliser les fonctions réutilisables du pipeline Jenkins.
+
+Elle facilite la maintenance du code Jenkins et évite de répéter les mêmes instructions dans plusieurs pipelines.
+
+Dans ce TP, une fonction dédiée à la construction et à la publication de l'image Docker est utilisée.
+
+Le pipeline peut charger la bibliothèque avec :
 
 ```groovy
 @Library('ci-lib') _
 ```
 
-La fonction `buildAndPush()` est ensuite appelée pour effectuer les opérations de build et de publication Docker.
+La fonction réutilisable est appelée depuis le pipeline :
 
-### 📸 Capture 15 — Build avec Shared Library
+```groovy
+buildAndPush(
+    imageName: 'nom-image',
+    tag: 'tag-image',
+    registry: 'dockerhub'
+)
+```
 
-**Fichier :** `captures/shared-library.png`
-
-> Cette capture présente le pipeline utilisant la Shared Library et le résultat du build Jenkins.
+> Les valeurs doivent correspondre à la configuration réelle du dépôt et de la Shared Library.
 
 ---
 
-# 📸 Livrables et captures d'écran
+# ⚙️ Fonctionnement du pipeline
 
-Les captures d'écran du TP sont organisées dans le dossier `captures/`.
+Le pipeline Jenkins est organisé autour des étapes suivantes :
 
-| Fichier | Description |
+| Étape | Description |
 |---|---|
-| `pipeline-stages.png` | Script lint, configuration et exécution du pipeline Jenkins |
-| `junit-report.png` | Test volontairement échoué et rapport JUnit après correction |
-| `credentials-masked.png` | Credentials Docker Hub et token masqué dans la console |
-| `dockerhub-sha-tag.png` | Image Docker Hub taguée avec le Git SHA |
-| `multibranch.png` | Job Multibranch, branches, Pull Request et vérification du stage Push |
-| `shared-library.png` | Shared Library et pipeline utilisant la fonction `buildAndPush()` |
+| Checkout | Récupération du code source Git |
+| Install | Installation des dépendances |
+| Lint | Vérification du code |
+| Unit Tests | Exécution des tests unitaires |
+| Build | Construction de l'image Docker |
+| Push | Publication de l'image sur Docker Hub |
+| Post | Publication des rapports et nettoyage |
 
-## ✅ Résultat final
+Les étapes de Lint et Unit Tests peuvent être exécutées en parallèle.
 
-Ce TP permet de mettre en pratique les principes du **Pipeline as Code** avec Jenkins.
+La publication de l'image Docker dépend de la configuration de la branche et des credentials Jenkins.
 
-Il démontre l'automatisation des étapes de validation, de test, de construction et de publication d'une application Node.js, tout en intégrant les agents Docker, les stages parallèles, la gestion sécurisée des credentials, le versionnement Git SHA et le Multibranch Pipeline.
+---
 
-La Shared Library permet de factoriser les opérations Docker et de rendre le pipeline plus réutilisable.
+# 🔒 Sécurité et bonnes pratiques
+
+Les bonnes pratiques étudiées dans ce TP sont :
+
+- Utilisation de credentials Jenkins pour les accès externes.
+- Protection des tokens et mots de passe.
+- Utilisation d'agents Docker pour isoler l'exécution.
+- Versionnement du pipeline avec Git.
+- Traçabilité des images Docker grâce aux tags.
+- Réutilisation des fonctions avec une Shared Library.
+- Vérification du code avant la publication de l'image.
+- Publication des rapports de tests.
+
+---
+
+# ✅ Conclusion
+
+Ce TP a permis de mettre en pratique les concepts fondamentaux de l'automatisation CI/CD avec Jenkins.
+
+La mise en place d'un pipeline déclaratif permet d'automatiser les étapes de vérification, de test et de publication d'une application.
+
+L'utilisation des agents Docker, des pipelines multibranches et des Shared Libraries améliore la réutilisabilité, la traçabilité et la maintenance du pipeline.
+
+Ce travail constitue une étape importante dans la maîtrise des outils DevOps et des pratiques d'intégration continue.
 
 ---
 
 <div align="center">
 
-**TP9 — Pipeline as Code avec Jenkins**
-
-Master DevOps & Cloud  
-ISET Tozeur
+**Réalisé dans le cadre du Master DevOps & Cloud — ISET Tozeur**
 
 </div>
