@@ -9,14 +9,16 @@ def call(Map config = [:]) {
     echo "🐳 Construction de l'image Docker : ${fullImageName}"
     sh "docker build -t ${fullImageName} ."
 
+    // Étape 1 : Récupérer le token dans une variable
+    def token = ""
     withCredentials([string(credentialsId: credentialsId, variable: 'DH_TOKEN')]) {
-        // Nettoyer tout cache Docker existant
-        sh 'rm -f ~/.docker/config.json || true'
-        
-        echo "🔑 Connexion à Docker Hub (docker.io)..."
-        sh 'echo "$DH_TOKEN" | docker login docker.io -u arijbelaid --password-stdin'
-        
-        echo "🚀 Push de l'image Docker : ${fullImageName}"
-        sh "docker push ${fullImageName}"
+        token = env.DH_TOKEN
     }
+
+    // Étape 2 : Login et push avec le token en clair
+    echo "🔑 Connexion à Docker Hub..."
+    sh "echo '${token}' | docker login docker.io -u arijbelaid --password-stdin"
+    
+    echo "🚀 Push de l'image Docker : ${fullImageName}"
+    sh "docker push ${fullImageName}"
 }
