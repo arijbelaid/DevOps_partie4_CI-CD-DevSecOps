@@ -15,6 +15,13 @@
 </div>
 
 ---
+## 📄 Rapport du TP
+
+Le rapport détaillé de ce TP est disponible au format Word :
+
+👉 **[Télécharger le rapport TP9](./rapport_tp9.docx)**
+
+---
 
 ## 📌 Présentation
 
