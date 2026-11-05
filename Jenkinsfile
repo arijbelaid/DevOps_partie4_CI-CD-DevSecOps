@@ -40,7 +40,7 @@ pipeline {
       steps {
         script {
           def imageBase = env.IMAGE_NAME.split('/')[-1]
-          def registryBase = 'arjbelaid'
+          def registryBase = 'docker.io/arjbelaid' // <-- Docker Hub explicite
 
           buildAndPush(
             imageName: imageBase,
