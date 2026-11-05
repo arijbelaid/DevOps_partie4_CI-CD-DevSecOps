@@ -9,13 +9,20 @@ def call(Map config = [:]) {
     echo "🐳 Construction de l'image Docker : ${fullImageName}"
     sh "docker build -t ${fullImageName} ."
 
-    echo "🔑 Connexion à Docker Hub..."
+    // Récupérer le token SANS le masquer dans une variable Groovy
+    def token = ""
     withCredentials([string(credentialsId: credentialsId, variable: 'DH_TOKEN')]) {
-        sh 'echo "$DH_TOKEN" | docker login -u arijbelaid --password-stdin'
+        token = env.DH_TOKEN
     }
 
+    // Nettoyer le token (supprimer espaces et retours à la ligne)
+    token = token.trim().replaceAll("\\s", "")
+
+    echo "🔑 Connexion à Docker Hub..."
+    sh "echo '${token}' | docker login docker.io -u arijbelaid --password-stdin"
+    
+    sleep 3
+    
     echo "🚀 Push de l'image Docker : ${fullImageName}"
-    // Le push est EN DEHORS du bloc withCredentials
-    // Docker utilise le fichier ~/.docker/config.json créé par le login
     sh "docker push ${fullImageName}"
 }
