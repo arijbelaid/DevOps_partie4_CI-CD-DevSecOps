@@ -1,18 +1,18 @@
 def call(Map config = [:]) {
     def imageName = config.imageName ?: 'contact-api'
     def tag = config.tag ?: 'latest'
-    def registry = config.registry ?: 'arjbelaid'
+    def registry = config.registry ?: 'docker.io/arjbelaid'
     def credentialsId = config.credentialsId ?: 'dockerhub-token-secret'
     
     def fullImageName = "${registry}/${imageName}:${tag}"
-    def shortName = "${imageName}:${tag}"
 
     echo "🐳 Construction de l'image Docker : ${fullImageName}"
     sh "docker build -t ${fullImageName} ."
 
     withCredentials([string(credentialsId: credentialsId, variable: 'DH_TOKEN')]) {
-        echo "🔑 Connexion à Docker Hub..."
-        sh 'echo "$DH_TOKEN" | docker login -u arijbelaid --password-stdin'
+        echo "🔑 Connexion à Docker Hub (docker.io)..."
+        // On précise explicitement docker.io pour que le token y soit associé
+        sh 'echo "$DH_TOKEN" | docker login docker.io -u arijbelaid --password-stdin'
         
         echo "🚀 Push de l'image Docker : ${fullImageName}"
         sh "docker push ${fullImageName}"
